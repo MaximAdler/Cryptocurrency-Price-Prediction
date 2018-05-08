@@ -39,6 +39,8 @@ class Train(object):
             end_date = '20180501'
             split_date = '2018-03-01'
             data_url = 'https://coinmarketcap.com/currencies/ethereum/historical-data/?start='
+        else:
+            return False
 
         crypto_data = pd.read_html(data_url + start_date + "&end=" + end_date)[0]
         crypto_data = crypto_data.assign(Date=pd.to_datetime(crypto_data['Date']))

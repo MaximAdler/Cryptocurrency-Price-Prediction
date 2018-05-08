@@ -22,14 +22,16 @@ class Predict(object):
         start_dates = ['20180408', '20180409', '20180410', '20180411', '20180412', '20180413', '20180414', '20180415']
         end_dates = ['20180428', '20180429', '20180430', '20180501', '20180502', '20180503', '20180504', '20180505']
 
+        if coin == 'btc':
+            real_currency = [9419.08, 9240.55, 9119.01, 9235.92, 9743.86, 9700.76, 9858.15, 9654.80]
+            coin_url = 'https://coinmarketcap.com/currencies/bitcoin/historical-data/?start='
+        elif coin == 'eth':
+            real_currency = [688.88, 669.92, 673.61, 687.15, 779.54, 785.62, 816.12, 792.31]
+            coin_url = 'https://coinmarketcap.com/currencies/ethereum/historical-data/?start='
+        else:
+            return False
+        
         if os.path.isfile(model_path):
-            if coin == 'btc':
-                real_currency = [9419.08, 9240.55, 9119.01, 9235.92, 9743.86, 9700.76, 9858.15, 9654.80]
-                coin_url = 'https://coinmarketcap.com/currencies/bitcoin/historical-data/?start='
-            elif coin == 'eth':
-                real_currency = [688.88, 669.92, 673.61, 687.15, 779.54, 785.62, 816.12, 792.31]
-                coin_url = 'https://coinmarketcap.com/currencies/ethereum/historical-data/?start='
-
             for start_date, end_date in zip(start_dates, end_dates):
                 time.strftime("%Y%m%d")
                 crypto_data = pd.read_html(coin_url + start_date + "&end=" + end_date)[0]
@@ -59,6 +61,6 @@ class Predict(object):
             print(predictions)
             print(pearsonr(predictions, real_currency))
         else:
-            return 'Firstly, train the Network!'
+            print 'Firstly, train the Network!\n'
 
         return True

@@ -7,21 +7,31 @@ sys.path.insert(0, sys.path[0]+'/src/Models')
 from Train import Train
 from Predict import Predict
 
+def helpMsg(err=False):
+    print('\n$ python main.py\n')
+    print('USAGE:')
+    print('     python main.py command [arguments...]\n')
+    print('COMMANDS:')
+    print('     --help,    -h                  Show help')
+    print('     --list,    -l                  Show list of available cryptocurrency')
+    print('     --train,   -t <cryptocurrency> Train network')
+    print('     --predict, -p <cryptocurrency> Predict cryptocurrency\n')
+    if err:
+        sys.exit(2)
+    else:
+        sys.exit()
+
+def availableCrypto():
+    print("\nAvailable cryptocurrencies:")
+    for i, c in enumerate(['BTC', 'ETH']):
+        print(str(i+1) + '. ' + c)
+    print("\n")
+
 def main(argv):
     print('\n')
     print('#'*34)
     print('# CRYPTOCURRENCY PRICE PREDICTOR #')
     print('#'*34)
-
-    def helpMsg(err=False):
-        print('\nTo train network: ')
-        print('python main.py --train <cryptocurrency>')
-        print('\nTo predict cryptocurrency: ')
-        print('python main.py --predict <cryptocurrency>\n')
-        if err:
-            sys.exit(2)
-        else:
-            sys.exit()
 
     if not argv:
         helpMsg()
@@ -35,18 +45,21 @@ def main(argv):
         if opt == '-h' or opt == '':
             helpMsg()
         elif opt in ("-l", "--list"):
-            print("\nAvailable cryptocurrencies:")
-            for i, c in enumerate(['BTC', 'ETH']):
-                print(str(i+1) + '. ' + c)
-            print("\n")
+            availableCrypto()
         elif opt in ("-t", "--train"):
             train = arg
             print('\nTrained cryptocurrency: %s\n' % train.upper())
-            Train.trainCoin(train)
+            train_coin = Train.trainCoin(train)
+            if not train_coin:
+                print('\nNo valid cryptocurrency!')
+                availableCrypto()
         elif opt in ("-p", "--predict"):
             predict = arg
             print('\nPredicted cryptocurrency: %s\n' % predict.upper())
-            Predict.predictCoin(predict)
+            predict_coin = Predict.predictCoin(predict)
+            if not predict_coin:
+                print('\nNo valid cryptocurrency!')
+                availableCrypto()
 
 if __name__ == '__main__':
     main(sys.argv[1:])
