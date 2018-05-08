@@ -17,6 +17,7 @@ class Train(object):
 
     @staticmethod
     def trainCoin(coin):
+        coin = coin.lower()
         model_path = ('assets/%s_model.h5' % coin)
         window_len = 20
         epochs = 100

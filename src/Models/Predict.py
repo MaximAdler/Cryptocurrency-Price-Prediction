@@ -15,6 +15,7 @@ class Predict(object):
 
     @staticmethod
     def predictCoin(coin):
+        coin = coin.lower()
         model_path = ('assets/%s_model.h5' % coin)
         predictions = []
         window_len = 20
