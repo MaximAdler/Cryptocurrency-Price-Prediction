@@ -18,13 +18,16 @@ class Predict(object):
         model_path = ('assets/%s_model.h5' % coin)
         predictions = []
         window_len = 20
+        start_dates = ['20180408', '20180409', '20180410', '20180411', '20180412', '20180413', '20180414', '20180415']
+        end_dates = ['20180428', '20180429', '20180430', '20180501', '20180502', '20180503', '20180504', '20180505']
 
         if os.path.isfile(model_path):
             if coin == 'btc':
-                start_dates = ['20180412', '20180413', '20180414', '20180415', '20180416']
-                end_dates = ['20180502', '20180503', '20180504', '20180505', '20180506']
-                ground_truth = [9235.92, 9743.86, 9700.76, 9858.15, 9654.80]
+                real_currency = [9419.08, 9240.55, 9119.01, 9235.92, 9743.86, 9700.76, 9858.15, 9654.80]
                 coin_url = 'https://coinmarketcap.com/currencies/bitcoin/historical-data/?start='
+            elif coin == 'eth':
+                real_currency = [688.88, 669.92, 673.61, 687.15, 779.54, 785.62, 816.12, 792.31]
+                coin_url = 'https://coinmarketcap.com/currencies/ethereum/historical-data/?start='
 
             for start_date, end_date in zip(start_dates, end_dates):
                 time.strftime("%Y%m%d")
@@ -53,7 +56,7 @@ class Predict(object):
                 predictions.append((((np.transpose(estimator.predict(LSTM_test_inputs)) + 1) * model_data[coin + '_Close'].values[:-window_len])[0])[0])
 
             print(predictions)
-            print(pearsonr(predictions, ground_truth))
+            print(pearsonr(predictions, real_currency))
         else:
             return 'Firstly, train the Network!'
 
