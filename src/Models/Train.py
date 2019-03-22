@@ -45,24 +45,26 @@ class Train(object):
         crypto_data = pd.read_html(data_url + start_date + "&end=" + end_date)[0]
         crypto_data = crypto_data.assign(Date=pd.to_datetime(crypto_data['Date']))
 
+        # print NeuralNetwork.arima(crypto_data[['Close**']])
+
         print(crypto_data.head())
         print('Shape: {}'.format(crypto_data.shape))
         Plot.drawTrend(crypto_data, coin.upper())
         print('\n')
 
         crypto_data.columns = [crypto_data.columns[0]] + [coin + '_' + i for i in crypto_data.columns[1:]]
-        kwargs = {coin + '_day_diff': lambda x: (x[coin + '_Close'] - x[coin + '_Open']) / x[coin + '_Open']}
+        kwargs = {coin + '_day_diff': lambda x: (x[coin + '_Close**'] - x[coin + '_Open*']) / x[coin + '_Open*']}
         crypto_data = crypto_data.assign(**kwargs)
 
         print(crypto_data.head())
         print('Shape: {}'.format(crypto_data.shape))
         print('\n')
-        Plot.drawTest(crypto_data, split_date, coin + "_Close", coin.upper())
+        Plot.drawTest(crypto_data, split_date, coin + "_Close**", coin.upper())
 
-        kwargs = {coin + '_close_off_high': lambda x: 2 * (x[coin + '_High'] - x[coin + '_Close']) / (x[coin + '_High'] - x[coin + '_Low']) -1,
-                  coin + '_volatility': lambda x: (x[coin + '_High'] - x[coin + '_Low']) / (x[coin + '_Open'])}
+        kwargs = {coin + '_close**_off_high': lambda x: 2 * (x[coin + '_High'] - x[coin + '_Close**']) / (x[coin + '_High'] - x[coin + '_Low']) -1,
+                  coin + '_volatility': lambda x: (x[coin + '_High'] - x[coin + '_Low']) / (x[coin + '_Open*'])}
         crypto_data = crypto_data.assign(**kwargs)
-        model_data = crypto_data[['Date'] + [coin + metric for metric in ['_Close', '_Volume', '_close_off_high', '_volatility', '_day_diff', '_Market Cap']]]
+        model_data = crypto_data[['Date'] + [coin + metric for metric in ['_Close**', '_Volume', '_close**_off_high', '_volatility', '_day_diff', '_Market Cap']]]
         model_data = model_data.sort_values(by='Date')
 
         print(model_data.head())
@@ -72,12 +74,12 @@ class Train(object):
         training_set, test_set = model_data[model_data['Date'] < split_date], model_data[model_data['Date'] >= split_date]
         training_set = training_set.drop('Date', 1)
         test_set =  test_set.drop('Date', 1)
-        normalise_cols = [coin + metric for metric in ['_Close', '_Volume', '_Market Cap']]
+        normalise_cols = [coin + metric for metric in ['_Close**', '_Volume', '_Market Cap']]
 
         LSTM_training_inputs = NeuralNetwork.normaliseInput(training_set, normalise_cols, window_len)
-        LSTM_training_outputs = NeuralNetwork.normaliseOutput(training_set, coin+'_Close', window_len)
+        LSTM_training_outputs = NeuralNetwork.normaliseOutput(training_set, coin+'_Close**', window_len)
         LSTM_test_inputs = NeuralNetwork.normaliseInput(test_set, normalise_cols, window_len)
-        LSTM_test_outputs = NeuralNetwork.normaliseOutput(test_set, coin+'_Close', window_len)
+        LSTM_test_outputs = NeuralNetwork.normaliseOutput(test_set, coin+'_Close**', window_len)
 
         print("\nNumber Of Input Training's sequences: {}".format(len(LSTM_training_inputs)))
         print("\nNumber Of Output Training's sequences: {}".format(len(LSTM_training_outputs)))
