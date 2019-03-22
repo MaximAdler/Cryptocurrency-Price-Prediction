@@ -7,6 +7,10 @@ sys.path.insert(0, sys.path[0]+'/src/Models')
 from Train import Train
 from Predict import Predict
 
+###
+from NeuralNetwork import NeuralNetwork
+###
+
 def helpMsg(err=False):
     print('\n$ python main.py\n')
     print('USAGE:')

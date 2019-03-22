@@ -2,6 +2,10 @@ from keras.models import Sequential
 from keras.layers import Activation, Dense, LSTM, Dropout
 from keras import metrics
 import keras.backend as Backend
+import statsmodels.api as sm
+from pandas import DataFrame
+from sklearn.metrics import r2_score
+import ml_metrics as metrics
 
 
 class NeuralNetwork(object):
@@ -13,6 +17,22 @@ class NeuralNetwork(object):
         square_sum = Backend.sum(Backend.square(y_true - y_pred))
         total_square_sum = Backend.sum(Backend.square(y_true - Backend.mean(y_true)))
         return (1 - square_sum / (total_square_sum + Backend.epsilon()))
+
+    @staticmethod
+    def arima(data):
+        model = sm.tsa.ARIMA(data, order=(1, 1, 1)).fit(disp=0)
+        print model.summary()
+        q_test = sm.tsa.stattools.acf(model.resid, qstat=True)
+        print DataFrame({'Q-stat':q_test[1], 'p-value':q_test[2]})
+
+        pred = model.predict(1567, 1587, typ='levels')
+        trn = data[1567:]
+        r2 = r2_score(trn, pred[1:21])
+        print 'R^2: %1.2f' % r2
+        print metrics.rmse(trn,pred[1:21])
+        print metrics.mae(trn,pred[1:21])
+
+        return '\nARIMA Success'
 
     @staticmethod
     def normaliseInput(dataset, cols, window_len):

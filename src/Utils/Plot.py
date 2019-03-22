@@ -22,7 +22,7 @@ class Plot(object):
         ax2.set_xticks([datetime.date(i, j, 1) for i in range(2013, 2019) for j in [1, 7]])
         ax2.set_xticklabels([datetime.date(i, j, 1).strftime('%b %Y')  for i in range(2013, 2019) for j in [1, 7]])
 
-        ax1.plot(data['Date'].astype(datetime.datetime), data['Open'])
+        ax1.plot(data['Date'].astype(datetime.datetime), data['Open*'])
         ax2.bar(data['Date'].astype(datetime.datetime).values, data['Volume'].values)
         fig.tight_layout()
         plt.show()
@@ -64,12 +64,12 @@ class Plot(object):
         ax.set_xticks([datetime.date(2018, i + 1, 1) for i in range(6)])
         ax.set_xticklabels([datetime.date(2018, i+1, 1).strftime('%b %d %Y') for i in range(6)])
         ax.plot(model_data[model_data['Date'] >= split_date]['Date'][window_len:].astype(datetime.datetime),
-                test_set[coin + '_Close'][window_len:], label='Actual')
+                test_set[coin + '_Close**'][window_len:], label='Actual')
         ax.plot(model_data[model_data['Date'] >= split_date]['Date'][window_len:].astype(datetime.datetime),
-                ((np.transpose(model.predict(LSTM_test_inputs)) + 1) * test_set[coin + '_Close'].values[:-window_len])[0],
+                ((np.transpose(model.predict(LSTM_test_inputs)) + 1) * test_set[coin + '_Close**'].values[:-window_len])[0],
                 label='Predicted')
         ax.annotate('MAE: %.4f' % np.mean(np.abs((np.transpose(model.predict(LSTM_test_inputs)) + 1) - \
-                                                 (test_set[coin + '_Close'].values[window_len:]) / (test_set[coin + '_Close'].values[:-window_len]))),
+                                                 (test_set[coin + '_Close**'].values[window_len:]) / (test_set[coin + '_Close**'].values[:-window_len]))),
                                                  xy=(0.75, 0.9), xycoords='axes fraction',
                                                  xytext=(0.75, 0.9), textcoords='axes fraction')
         ax.set_title('Test Set: Single Timepoint Prediction', fontsize=13)
