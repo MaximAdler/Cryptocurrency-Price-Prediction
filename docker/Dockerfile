@@ -8,4 +8,4 @@ RUN pip3 install --upgrade setuptools pip && \
     pip3 install --no-cache-dir -r /tmp/docker-requirements.txt
 
 
-RUN python3 /opt/predictor/run.py
+ENTRYPOINT ["python3", "/opt/predictor/run.py"]

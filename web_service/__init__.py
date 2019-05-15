@@ -5,6 +5,7 @@ from flask import Flask
 from flask import render_template, request
 from flask_api import status
 
+from . import db, auth
 
 
 def create_app(test_config=None):
@@ -12,7 +13,7 @@ def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
         SECRET_KEY='dev',
-        DATABASE=os.path.join(app.instance_path, 'web-service.sqlite'),
+        DATABASE=os.path.join(app.instance_path, 'web_service.sqlite'),
     )
 
     if test_config is None:
@@ -29,10 +30,6 @@ def create_app(test_config=None):
     def main():
         return render_template('base.html')
 
-    @app.route('/monitoring')
-    def monitoring():
-        return render_template('monitoring/index.html')
-
     @app.route('/predicting')
     def predicting():
         return render_template('predicting/index.html')
@@ -45,6 +42,8 @@ def create_app(test_config=None):
                 return ('SERVICE_UNAVAILABLE', status.HTTP_503_SERVICE_UNAVAILABLE, )
             return ('OK', status.HTTP_200_OK, )
 
+    db.init_app(app)
 
+    app.register_blueprint(auth.bp)
 
     return app
