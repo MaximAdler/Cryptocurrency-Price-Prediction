@@ -2,7 +2,7 @@ import os
 import subprocess
 
 from flask import Flask
-from flask import render_template, request
+from flask import render_template, request, url_for, redirect
 from flask_api import status
 
 from . import db, auth
@@ -34,13 +34,22 @@ def create_app(test_config=None):
     def predicting():
         return render_template('predicting/index.html')
 
+    @app.route('/predicted')
+    def predicted():
+        return render_template('predicting/predicted.html')
+
     @app.route('/predict', methods=('POST',))
     def predict():
         if request.method == 'POST':
-            response = subprocess.call(['sh', 'run_predictor.sh'])
-            if response != 0:
-                return ('SERVICE_UNAVAILABLE', status.HTTP_503_SERVICE_UNAVAILABLE, )
-            return ('OK', status.HTTP_200_OK, )
+            # TODO: decomment
+            # response = subprocess.call(['sh', 'run_predictor.sh'])
+            # if response != 0:
+            #     return ('SERVICE_UNAVAILABLE', status.HTTP_503_SERVICE_UNAVAILABLE, )
+            return redirect(url_for('predicted'))
+
+
+
+
 
     db.init_app(app)
 
