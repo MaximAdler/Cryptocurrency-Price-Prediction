@@ -7,7 +7,6 @@ import numpy as np
 from utils import constants as const
 
 
-# TODO: delete (prev: get_market_data)
 def parse(market: str,
           tag: str,
           date_column: str='Date',
@@ -23,7 +22,6 @@ def parse(market: str,
     return df
 
 
-# TODO: delete (prev: merge_data)
 def join(df1: pd.DataFrame,
          df2: pd.DataFrame,
          date_column: str='Date',
