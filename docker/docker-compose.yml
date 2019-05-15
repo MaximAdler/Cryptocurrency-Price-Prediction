@@ -1,0 +1,10 @@
+version: "3"
+services:
+  predictor:
+    build:
+      context: ./
+    ports:
+      - 3000:3000
+    volumes:
+      - ./predictor:/opt/predictor
+    privileged: true

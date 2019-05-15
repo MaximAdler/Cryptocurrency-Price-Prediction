@@ -1,0 +1,10 @@
+NEURONS = 512                 # number of hidden units in the LSTM layer
+ACTIVATION_FUNCTION = 'tanh'  # activation function for LSTM and Dense layer
+LOSS = 'mse'                  # loss function for calculating the gradient, in this case Mean Squared Error
+OPTIMIZER = 'adam'            # optimizer for appljying gradient decent
+DROPOUT = 0.25                # dropout ratio used after each LSTM layer to avoid overfitting
+BATCH_SIZE = 128
+EPOCHS = 53
+WINDOW_LEN = 7                # is an intiger to be used as the look back window for creating a single input sample.
+TRAINING_SIZE = 0.8           # porportion of data to be used for training
+MERGE_DATE = '2016-01-01'     # the earliest date which we have data for both ETH and BTC or any other provided coin
