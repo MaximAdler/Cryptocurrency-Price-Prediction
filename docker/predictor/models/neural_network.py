@@ -1,4 +1,5 @@
 import pandas as pd
+import matplotlib.pyplot as plt
 
 import keras
 from keras.models import Sequential
@@ -9,23 +10,6 @@ from keras.layers import Dropout
 from utils import helpers
 from utils import constants as const
 
-"""
-btc_data = h.parse('bitcoin', 'BTC')
-eth_data = h.parse("ethereum", 'ETH')
-market_data = h.join(btc_data, eth_data)
-m = nn.NeuralNetwork(market_data, ['BTC', 'ETH'])
-m.create_model()
-m.split_data()
-m.drop('Date', 1)
-m.create_inputs()
-y_train_btc, y_test_btc = m.create_outputs('BTC')
-#
-import gc
-gc.collect()
-np.random.seed(202)
-m.build_model()
-btc_history = m.fit(y_train_btc, y_test_btc)
-"""
 
 class NeuralNetwork:
 
@@ -40,6 +24,7 @@ class NeuralNetwork:
         self.model = None
         self.fitted_model = None
 
+
     def add_volatility(self) -> 'NeuralNetwork':
         for coin in self.coins:
             kwargs = {
@@ -53,7 +38,7 @@ class NeuralNetwork:
             self.data = self.data.assign(**kwargs)
         return self
 
-    # TODO: delete (prev: create_model_data)
+
     def create_model(self,
                      metrics: list=['Close**','Volume']) -> 'NeuralNetwork':
         self.data = self.data[[self.date_column] + ['{}_{}'.format(coin, metric) for coin in self.coins for metric in metrics]]
@@ -71,6 +56,7 @@ class NeuralNetwork:
         self.test_set = self.data[int(training_size*len(self.data)):]
         return self
 
+
     def drop(self, column: str, axis: int=1, splitted_set: bool=True) -> 'NeuralNetwork':
         if splitted_set:
             self.train_set = self.train_set.drop(column, axis)
@@ -80,11 +66,6 @@ class NeuralNetwork:
         return self
 
 
-    # TODO: delete (
-    #    X_train = create_inputs(train_set)
-    #    X_test = create_inputs(test_set)
-    #    X_train, X_test = to_array(X_train), to_array(X_test)
-    # )
     def create_inputs(self,
                       metrics: list=['Close**', 'Volume'],
                       window_len: int=const.WINDOW_LEN) -> 'NeuralNetwork':
@@ -101,10 +82,7 @@ class NeuralNetwork:
         self.x_train, self.x_test = results
         return self
 
-    # TODO: delete (
-    #    Y_train_btc = create_outputs(train_set, coin='BTC')
-    #    Y_test_btc = create_outputs(test_set, coin='BTC')
-    # )
+
     def create_outputs(self, coin: str, window_len: int=const.WINDOW_LEN) -> list:
         results = []
         for data in [self.train_set, self.test_set]:
@@ -142,33 +120,32 @@ class NeuralNetwork:
                                            validation_data=(self.x_test, y_test), shuffle=shuffle)
         return self
 
-    # def plot_results(self, model, Y_target, coin, X_train, test_set, X_test, market_data):
-    #     plt.figure(figsize=(25, 20))
-    #     plt.subplot(311)
-    #     plt.plot(self.fitted_model.epoch, self.fitted_model.history['loss'], )
-    #     plt.plot(self.fitted_model.epoch, self.fitted_model.history['val_loss'])
-    #     plt.xlabel('Number of Epochs')
-    #     plt.ylabel('Loss')
-    #     plt.title(coin + ' Model Loss')
-    #     plt.legend(['Training', 'Test'])
-    #     plt.subplot(312)
-    #     plt.plot(Y_target)
-    #     plt.plot(model.predict(X_train))
-    #     plt.xlabel('Dates')
-    #     plt.ylabel('Price')
-    #     plt.title(coin + ' Single Point Price Prediction on Training Set')
-    #     plt.legend(['Actual','Predicted'])
-    #     ax1 = plt.subplot(313)
-    #     plt.plot(test_set[coin + '_Close**'][window_len:].values.tolist())
-    #     plt.plot(((np.transpose(model.predict(X_test)) + 1) * test_set[coin + '_Close**'].values[:-window_len])[0])
-    #     plt.xlabel('Dates')
-    #     plt.ylabel('Price')
-    #     plt.title(coin + ' Single Point Price Prediction on Test Set')
-    #     plt.legend(['Actual','Predicted'])
-    #     date_list = h.date_labels(market_data, X_test)
-    #     ax1.set_xticks([x for x in range(len(date_list))])
-    #     for label in ax1.set_xticklabels([date for date in date_list], rotation='vertical')[::2]:
-    #     label.set_visible(False)
-    #     plt.show()
-    #
-    #     plot_results(btc_history, m.model, y_train_btc, coin='BTC')
+    def plot_results(self, coin: str, market_data: pd.DataFrame, y_train: pd.DataFrame) -> None:
+        plt.figure(figsize=(25, 20))
+        plt.subplot(311)
+        plt.plot(self.fitted_model.epoch, self.fitted_model.history['loss'], )
+        plt.plot(self.fitted_model.epoch, self.fitted_model.history['val_loss'])
+        plt.xlabel('Number of Epochs')
+        plt.ylabel('Loss')
+        plt.title('{} Model Loss'.format(coin))
+        plt.legend(['Training', 'Test'])
+        plt.subplot(312)
+        plt.plot(y_train)
+        plt.plot(self.model.predict(self.x_train))
+        plt.xlabel('Dates')
+        plt.ylabel('Price')
+        plt.title('{} Single Point Price Prediction on Training Set'.format(coin))
+        plt.legend(['Actual','Predicted'])
+        ax1 = plt.subplot(313)
+        plt.plot(self.test_set['{}_Close**'.format(coin)][const.WINDOW_LEN:].values.tolist())
+        plt.plot(((np.transpose(self.model.predict(self.x_test)) + 1) \
+                  * self.test_set['{}_Close**'.format(coin)].values[:-const.WINDOW_LEN])[0])
+        plt.xlabel('Dates')
+        plt.ylabel('Price')
+        plt.title('{} Single Point Price Prediction on Test Set'.format(coin))
+        plt.legend(['Actual','Predicted'])
+        date_list = h.date_labels(market_data, self.x_test)
+        ax1.set_xticks([x for x in range(len(date_list))])
+        for label in ax1.set_xticklabels([date for date in date_list], rotation='vertical')[::2]:
+            label.set_visible(False)
+        plt.savefig('assets/{}'.format(coin))
