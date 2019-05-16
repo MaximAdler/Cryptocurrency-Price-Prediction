@@ -41,14 +41,10 @@ def create_app(test_config=None):
     @app.route('/predict', methods=('POST',))
     def predict():
         if request.method == 'POST':
-            # TODO: decomment
-            # response = subprocess.call(['sh', 'run_predictor.sh'])
-            # if response != 0:
-            #     return ('SERVICE_UNAVAILABLE', status.HTTP_503_SERVICE_UNAVAILABLE, )
+            response = subprocess.call(['sh', 'run_predictor.sh'])
+            if response != 0:
+                return ('SERVICE_UNAVAILABLE', status.HTTP_503_SERVICE_UNAVAILABLE, )
             return redirect(url_for('predicted'))
-
-
-
 
 
     db.init_app(app)
